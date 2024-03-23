@@ -224,7 +224,6 @@ def main() -> None:
         sys.exit(1)
     contents = settings.github_event_path.read_text()
     event = PartialGitHubEvent.model_validate_json(contents)
-    logging.info("Event: %s", event.json())
     if event.issue.number is not None:
         number = event.issue.number
     else:
