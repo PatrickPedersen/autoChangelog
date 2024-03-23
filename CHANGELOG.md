@@ -1,4 +1,4 @@
-### Changelog
+### Latest Changes
 
 #### Breaking Changes
 
