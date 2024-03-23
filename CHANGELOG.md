@@ -1,6 +1,8 @@
 ### Changelog
 
+#### Breaking Changes
 
+* Reformatted main.py to make it more readable. Issue [#5](https://github.com/PatrickPedersen/autoChangelog/issues/5) by [@PatrickPedersen](https://github.com/PatrickPedersen).
 
 #### Docs
 
