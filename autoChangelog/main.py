@@ -45,9 +45,13 @@ class PartialGitHubEventInputs(BaseModel):
     number: int
 
 
-class PartialGitHubEvent(BaseModel):
+class PartialGitHubIssue(BaseModel):
     number: Optional[int] = None
     inputs: Optional[PartialGitHubEventInputs] = None
+
+
+class PartialGitHubEvent(BaseModel):
+    issue: Optional[PartialGitHubIssue] = None
 
 
 class TemplateDataUser(BaseModel):
