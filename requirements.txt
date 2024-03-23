@@ -1,1 +1,4 @@
 PyGithub
+pydantic>=2.0.0
+pydantic-settings
+Jinja2

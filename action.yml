@@ -5,10 +5,36 @@ inputs:
   token:
     description: 'The GitHub token to use for authentication'
     required: true
+  input_changelog_file:
+    description: 'The file to add the changelog to'
+    default: 'CHANGELOG.md'
+    required: false
   latest_changes_header:
     description: 'The header to use for the latest changes section'
-    required: false
     default: '### Latest Changes'
+    required: false
+  debug_logs:
+    description: 'Enable debug logs'
+    required: false
+    default: 'false'
+  labels:
+    description: 'The labels to use for the changelog'
+    required: false
+    default: >
+      [
+        {"label": "breaking", "header": "Breaking Changes"},
+        {"label": "security", "header": "Security Fixes"},
+        {"label": "feature", "header": "Features"},
+        {"label": "bug", "header": "Fixes"},
+        {"label": "refactor", "header": "Refactors"},
+        {"label": "upgrade", "header": "Upgrades"},
+        {"label": "docs", "header": "Docs"},
+        {"label": "lang-all", "header": "Translations"},
+        {"label": "internal", "header": "Internal"}
+      ]
+  label_header_prefix:
+    description: 'The prefix to use for the label headers'
+    default: '#### '
 runs:
   using: docker
   image: Dockerfile
