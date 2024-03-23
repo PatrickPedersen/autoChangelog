@@ -223,7 +223,7 @@ def update_changelog(settings, issue) -> None:
     settings.input_changelog_file.write_text(new_content)
     logging.info("Committing changes to: %s", settings.input_changelog_file)
     subprocess.run(["git", "add", str(settings.input_changelog_file)], check=True)
-    subprocess.run(["git", "commit", "-m", "Update Changelog"], check=True)
+    subprocess.run(["git", "commit", "-m", "[CI] Update Changelog"], check=True)
     logging.info("Pushing changes")
     subprocess.run(["git", "push"], check=True)
 
