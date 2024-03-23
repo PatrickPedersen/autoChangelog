@@ -3,7 +3,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 from github import Github
 from github.Issue import Issue
@@ -85,27 +85,33 @@ def generate_markdown_content(
         raise RuntimeError(
             f"Changelog title not found in {settings.input_changelog_file}"
         )
-    template_content = settings.input_template_file.read_text("utf-8")
-    template = Template(template_content)
-    message = template.render(issue=issue)
+    message = Template(settings.input_template_file.read_text("utf-8")).render(issue=issue)
     if message in content:
         raise RuntimeError(
             f"Changelog entry already exists for issue: {issue.number}"
         )
-    pre_header_content = content[: header_match.end()].strip()
-    post_header_content = content[header_match.end() :].strip()
     next_release_match = re.search(
-        settings.input_end_regex, post_header_content, flags=re.MULTILINE
+        settings.input_end_regex, content[header_match.end():].strip(), flags=re.MULTILINE
     )
     release_end = (
         len(content)
         if not next_release_match
         else header_match.end() + next_release_match.start()
     )
-    release_content = content[header_match.end() : release_end].strip()
+    release_content = content[header_match.end(): release_end].strip()
+    sectionless_content, new_sections = get_release_content(release_content, labels, message, settings)
+    new_release_content = get_new_release_content(sectionless_content, new_sections, settings)
+    pre_header_content = content[: header_match.end()].strip()
     post_release_content = content[release_end:].strip()
+    new_content = (
+            f"{pre_header_content}\n\n{new_release_content}\n\n{post_release_content}".strip()
+            + "\n"
+    )
+    return new_content
+
+
+def get_sections(release_content: str, settings: Settings) -> list[SectionContent]:
     sections: list[SectionContent] = []
-    sectionless_content = ""
     for label in settings.input_labels:
         label_match = re.search(
             f"^{settings.input_label_header_prefix}{label.header}",
@@ -116,7 +122,7 @@ def generate_markdown_content(
             continue
         next_label_match = re.search(
             f"^{settings.input_label_header_prefix}",
-            release_content[label_match.end() :],
+            release_content[label_match.end():],
             flags=re.MULTILINE,
         )
         label_section_end = (
@@ -124,7 +130,7 @@ def generate_markdown_content(
             if not next_label_match
             else label_match.end() + next_label_match.start()
         )
-        label_content = release_content[label_match.end() : label_section_end].strip()
+        label_content = release_content[label_match.end(): label_section_end].strip()
         section = SectionContent(
             label=label.label,
             header=label.header,
@@ -133,11 +139,10 @@ def generate_markdown_content(
         )
         sections.append(section)
     sections.sort(key=lambda x: x.index)
-    sections_keys = {section.label: section for section in sections}
-    if not sections:
-        sectionless_content = release_content
-    elif sections[0].index > 0:
-        sectionless_content = release_content[: sections[0].index].strip()
+    return sections
+
+
+def get_new_sections(sections_keys, labels, message, settings: Settings) -> tuple[list[SectionContent], bool, Any]:
     new_sections: list[SectionContent] = []
     found = False
     for label in settings.input_labels:
@@ -155,11 +160,10 @@ def generate_markdown_content(
             found = True
             section.content = f"{message}\n{section.content}".strip()
         new_sections.append(section)
-    if not found:
-        if sectionless_content:
-            sectionless_content = f"{message}\n{sectionless_content}"
-        else:
-            sectionless_content = f"{message}"
+    return new_sections, found, message
+
+
+def get_new_release_content(sectionless_content, new_sections, settings: Settings) -> str:
     new_release_content = ""
     if sectionless_content:
         new_release_content = f"{sectionless_content}"
@@ -174,11 +178,29 @@ def generate_markdown_content(
             new_release_content += f"\n\n{updated_content}"
     else:
         new_release_content = updated_content
-    new_content = (
-        f"{pre_header_content}\n\n{new_release_content}\n\n{post_release_content}".strip()
-        + "\n"
-    )
-    return new_content
+    return new_release_content
+
+
+def get_release_content(
+        release_content: str,
+        labels,
+        message,
+        settings: Settings
+) -> tuple[str, list[SectionContent]]:
+    sections = get_sections(release_content, settings)
+    sections_keys = {section.label: section for section in sections}
+    sectionless_content = ""
+    if not sections:
+        sectionless_content = release_content
+    elif sections[0].index > 0:
+        sectionless_content = release_content[: sections[0].index].strip()
+    new_sections, found, message = get_new_sections(sections_keys, labels, message, settings)
+    if not found:
+        if sectionless_content:
+            sectionless_content = f"{message}\n{sectionless_content}"
+        else:
+            sectionless_content = f"{message}"
+    return sectionless_content, new_sections
 
 
 def setup_gituser() -> None:
