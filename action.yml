@@ -5,7 +5,7 @@ inputs:
   token:
     description: 'The GitHub token to use for authentication'
     required: true
-  input_changelog_file:
+  changelog_file:
     description: 'The file to add the changelog to'
     default: 'CHANGELOG.md'
     required: false
