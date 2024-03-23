@@ -208,6 +208,13 @@ def update_changelog(settings, issue) -> None:
 
 
 def main() -> None:
+    # Ref: https://github.com/actions/runner/issues/2033
+    logging.info(
+        "GitHub Actions workaround for git in containers, ref: https://github.com/actions/runner/issues/2033"
+    )
+    safe_directory_config_content = "[safe]\n\tdirectory = /github/workspace"
+    dotgitconfig_path = Path.home() / ".gitconfig"
+    dotgitconfig_path.write_text(safe_directory_config_content)
     settings = Settings()
     if settings.input_debug_logs:
         logging.info("Settings: %s", settings.json())
