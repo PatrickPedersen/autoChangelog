@@ -1,0 +1,14 @@
+name: AutoChangelog
+author: Patrick Pedersen
+description: Update your changelog automatically based on closed issues
+inputs:
+  token:
+    description: 'The GitHub token to use for authentication'
+    required: true
+  latest_changes_header:
+    description: 'The header to use for the latest changes section'
+    required: false
+    default: '### Latest Changes'
+runs:
+  using: docker
+  image: Dockerfile
