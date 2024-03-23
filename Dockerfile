@@ -9,7 +9,6 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
 COPY autoChangelog /app/autoChangelog
-COPY CHANGELOG.md /app/CHANGELOG.md
 
 ENV PYTHONPATH=/app
 
