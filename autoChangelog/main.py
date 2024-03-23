@@ -217,7 +217,7 @@ def main() -> None:
         logging.error("Event file not found: %s", settings.github_event_path)
         sys.exit(1)
     contents = settings.github_event_path.read_text()
-    event = PartialGitHubEvent.mode_validate_json(contents)
+    event = PartialGitHubEvent.model_validate_json(contents)
     if event.number is not None:
         number = event.number
     elif event.inputs and event.inputs.number:
