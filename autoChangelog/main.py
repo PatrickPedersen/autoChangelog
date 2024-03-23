@@ -99,8 +99,8 @@ def generate_markdown_content(
         else header_match.end() + next_release_match.start()
     )
     release_content = content[header_match.end(): release_end].strip()
-    sectionless_content, new_sections = get_release_content(release_content, labels, message, settings)
-    new_release_content = get_new_release_content(sectionless_content, new_sections, settings)
+    section_less_content, new_sections = get_release_content(release_content, labels, message, settings)
+    new_release_content = get_new_release_content(section_less_content, new_sections, settings)
     pre_header_content = content[: header_match.end()].strip()
     post_release_content = content[release_end:].strip()
     new_content = (
@@ -163,10 +163,10 @@ def get_new_sections(sections_keys, labels, message, settings: Settings) -> tupl
     return new_sections, found, message
 
 
-def get_new_release_content(sectionless_content, new_sections, settings: Settings) -> str:
+def get_new_release_content(section_less_content, new_sections, settings: Settings) -> str:
     new_release_content = ""
-    if sectionless_content:
-        new_release_content = f"{sectionless_content}"
+    if section_less_content:
+        new_release_content = f"{section_less_content}"
     use_sections = [
         f"{settings.input_label_header_prefix}{section.header}\n\n{section.content}"
         for section in new_sections
@@ -189,18 +189,18 @@ def get_release_content(
 ) -> tuple[str, list[SectionContent]]:
     sections = get_sections(release_content, settings)
     sections_keys = {section.label: section for section in sections}
-    sectionless_content = ""
+    section_less_content = ""
     if not sections:
-        sectionless_content = release_content
+        section_less_content = release_content
     elif sections[0].index > 0:
-        sectionless_content = release_content[: sections[0].index].strip()
+        section_less_content = release_content[: sections[0].index].strip()
     new_sections, found, message = get_new_sections(sections_keys, labels, message, settings)
     if not found:
-        if sectionless_content:
-            sectionless_content = f"{message}\n{sectionless_content}"
+        if section_less_content:
+            section_less_content = f"{message}\n{section_less_content}"
         else:
-            sectionless_content = f"{message}"
-    return sectionless_content, new_sections
+            section_less_content = f"{message}"
+    return section_less_content, new_sections
 
 
 def setup_gituser() -> None:
