@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     github_event_path: Path
     github_event_name: Optional[str] = None
     input_token: SecretStr
-    input_changelog_file: Path = Path("CHANGELOG.md")
+    input_changelog_file: Path = Path("../CHANGELOG.md")
     input_changelog_title: str = "### Changelog"
     input_template_file: Path = Path(__file__).parent / "templates/changelog.jinja2"
     input_end_regex: str = "(^### .*)|(^## .*)"

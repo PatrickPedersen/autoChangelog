@@ -8,8 +8,8 @@ COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install -r /app/requirements.txt
 
-COPY main.py /app/main.py
+COPY autoChangelog /app/autoChangelog
 
 ENV PYTHONPATH=/app
 
-CMD ["python", "/app/main.py"]
+CMD ["python", "-m", "autoChangelog"]
