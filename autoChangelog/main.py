@@ -41,13 +41,8 @@ class Settings(BaseSettings):
     input_label_header_prefix: str = "#### "
 
 
-class PartialGitHubEventInputs(BaseModel):
-    number: int
-
-
 class PartialGitHubIssue(BaseModel):
     number: Optional[int] = None
-    inputs: Optional[PartialGitHubEventInputs] = None
 
 
 class PartialGitHubEvent(BaseModel):
@@ -230,10 +225,8 @@ def main() -> None:
     contents = settings.github_event_path.read_text()
     event = PartialGitHubEvent.model_validate_json(contents)
     logging.info("Event: %s", event.json())
-    if event.number is not None:
-        number = event.number
-    elif event.inputs and event.inputs.number:
-        number = event.inputs.number
+    if event.issue.number is not None:
+        number = event.issue.number
     else:
         logging.error("No Issue number was found in the event file at: %s", settings.github_event_path)
         sys.exit(1)
